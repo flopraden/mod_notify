@@ -29,8 +29,8 @@
 
 module notify_module;
 
-char *substitute_variables(cmd_rec *cmd, const char *in);
-int sendmail(const char *from_name, const char *from_address, const char *to, const char *subject, const char *body);
+static char *substitute_variables(cmd_rec *cmd, const char *in);
+static int sendmail(const char *from_name, const char *from_address, const char *to, const char *subject, const char *body);
 
 /**
  * Send SMTP notifications for newly uploaded files
@@ -166,10 +166,7 @@ static int send_line(int handle, const char *msg) {
 }
 
 static int sendmail(const char *from_name, const char *from_address, const char *to, const char *subject, const char *body) {
-	FILE *p = NULL;
-	int pfd;
 	char tmp[256];
-	char tmp2[256];
 	char date[256];
 	time_t t;
 	struct tm tm;
@@ -239,7 +236,7 @@ static int sendmail(const char *from_name, const char *from_address, const char 
 		pr_log_pri(PR_LOG_ERR, MOD_NOTIFY_VERSION ": error: RCPT TO failed: %d", smtp_code);
 		return -1;
 	}
-	snprintf(tmp, sizeof(tmp), "DATA\n", to);
+	snprintf(tmp, sizeof(tmp), "DATA\n");
 	send_line(sockd, tmp);
 	smtp_code = read_code(sockd);
 	if (smtp_code != 354) {
@@ -276,7 +273,7 @@ static int sendmail(const char *from_name, const char *from_address, const char 
 		return -1;
 	}
 	
-	snprintf(tmp, sizeof(tmp), "QUIT\n", body);
+	snprintf(tmp, sizeof(tmp), "QUIT\n");
 	send_line(sockd, tmp);
 	
 	close(sockd);
